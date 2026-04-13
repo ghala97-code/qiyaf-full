@@ -5,3 +5,6 @@ __pycache__/
 app/uploads/
 .env
 *.db
+app/ml_models/*.pt
+app/ml_models/*.pth
+

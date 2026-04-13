@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 
 app = FastAPI(
-    title="نظام نيشان لكشف أعطال الألواح الشمسية",
+    title="نظام قياف لكشف أعطال الألواح الشمسية",
     description="Backend API for Solar Panel Fault Detection using UAV and AI",
     version="1.0.0"
 )
@@ -14,7 +14,7 @@ def read_root():
     """
     return {
         "status": "online",
-        "message": "مرحباً بكم في نظام نيشان - الباك آند يعمل بنجاح",
+        "message": "مرحباً بكم في نظام قياف - الباك آند يعمل بنجاح",
         "project": "Solar Panel Fault Detection"
     }
 
