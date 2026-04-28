@@ -16,28 +16,35 @@ services:
     image: redis:7-alpine
     container_name: qiyaf_redis
     restart: always
+    ports:
+      - "6379:6379"
 
   api:
     build: .
     container_name: qiyaf_api
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    network_mode: host
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
     depends_on:
       - db
       - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@127.0.0.1:5432/qiyaf_db
+      - REDIS_URL=redis://127.0.0.1:6379/0
 
   worker:
     build: .
     container_name: qiyaf_worker
+    network_mode: host
     command: celery -A app.core.celery_config.celery_app worker --loglevel=info
     volumes:
       - .:/app
     depends_on:
       - db
       - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@127.0.0.1:5432/qiyaf_db
+      - REDIS_URL=redis://127.0.0.1:6379/0
 
 volumes:
   qiyaf_postgres_data:

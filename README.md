@@ -8,7 +8,7 @@
 
 \### 1. Clone the repo
 
-git clone https://github.com/ghala97-code/grad-project.git
+git clone https://github.com/ghala97-code/grad-project-backup.git
 
 cd grad-project
 
