@@ -4,7 +4,8 @@ from app.core.database import engine
 from app.db import models
 from app.core.config import settings
 from app.routers import model_router
-from app.routers import upload, prediction 
+from app.routers import upload, prediction
+from app.routers import inference
 
 # خطوة مهمة للدوكر: إنشاء الجداول تلقائياً في Postgres أول ما يشتغل السيرفر
 models.Base.metadata.create_all(bind=engine)
@@ -22,6 +23,7 @@ app.include_router(inspections.router)
 app.include_router(model_router.router)
 app.include_router(upload.router)
 app.include_router(prediction.router)
+app.include_router(inference.router)
 
 @app.get("/")
 def read_root():
