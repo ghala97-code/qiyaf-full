@@ -22,20 +22,24 @@ services:
   api:
     build: .
     container_name: qiyaf_api
-    network_mode: host
+    # حذفنا network_mode: host واستخدمنا ports بدلاً منها
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
     depends_on:
       - db
       - redis
     environment:
-      - DATABASE_URL=postgresql://postgres:password123@127.0.0.1:5432/qiyaf_db
-      - REDIS_URL=redis://127.0.0.1:6379/0
+      # نستخدم أسماء الخدمات (db, redis) لأن الدوكر سيتولى الربط بينهم داخلياً
+      - DATABASE_URL=postgresql://postgres:password123@db:5432/qiyaf_db
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_SERVER=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
 
   worker:
     build: .
     container_name: qiyaf_worker
-    network_mode: host
     command: celery -A app.core.celery_config.celery_app worker --loglevel=info
     volumes:
       - .:/app
@@ -43,8 +47,10 @@ services:
       - db
       - redis
     environment:
-      - DATABASE_URL=postgresql://postgres:password123@127.0.0.1:5432/qiyaf_db
-      - REDIS_URL=redis://127.0.0.1:6379/0
+      - DATABASE_URL=postgresql://postgres:password123@db:5432/qiyaf_db
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_SERVER=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
 
 volumes:
   qiyaf_postgres_data:
