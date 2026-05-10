@@ -1,10 +1,11 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware # استيراد المكتبة المطلوبة
 from app.routers import auth, inspections, upload, prediction, inference
 from app.core.database import engine
 from app.db import models
 from app.core.config import settings
 
-# إنشاء الجداول (تأكدي أن الـ Base مستورد صح من الـ models)
+# إنشاء الجداول
 models.SQLModel.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -13,10 +14,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# --- إضافة إعدادات الـ CORS للربط مع الفرونت آند ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # يسمح لجميع الروابط بالوصول (مناسب جداً وقت التطوير والاجتماع)
+    allow_credentials=True,
+    allow_methods=["*"], # يسمح بجميع أنواع الطلبات (GET, POST, etc.)
+    allow_headers=["*"], # يسمح بجميع الـ Headers
+)
+
 # --- ربط المسارات (Routers) ---
 app.include_router(auth.router)
 app.include_router(inspections.router)
-app.include_router(inference.router) # هذا هو راوتر الـ AI اللي فيه analyze-chunk
+app.include_router(inference.router)
 app.include_router(upload.router)
 app.include_router(prediction.router)
 
