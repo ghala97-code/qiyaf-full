@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Unified Qiya dark navy theme — matches dashboard System Overview */
+    --background: 213 65% 5%;        /* #050B16 */
+    --foreground: 0 0% 98%;
+
+    --card: 213 70% 8%;              /* #071426 */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 213 70% 7%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Teal/cyan primary from logo */
+    --primary: 184 75% 48%;
+    --primary-foreground: 0 0% 4%;
+
+    --secondary: 213 60% 11%;        /* #0A1B33 */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 213 50% 13%;
+    --muted-foreground: 210 15% 65%;
+
+    /* Amber/orange accent from logo */
+    --accent: 28 95% 58%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 213 40% 18%;
+    --input: 213 50% 13%;
+    --ring: 184 75% 48%;
+
+    --gradient-brand: linear-gradient(135deg, hsl(184 75% 48%), hsl(28 95% 58%));
+    --gradient-radial-glow: radial-gradient(ellipse at top, hsl(184 75% 48% / 0.15), transparent 60%);
+    --shadow-brand: 0 20px 60px -20px hsl(184 75% 48% / 0.4);
+    --shadow-card: 0 10px 40px -10px hsl(0 0% 0% / 0.6);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 213 65% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 184 75% 48%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 213 60% 11%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 213 40% 18%;
+    --sidebar-ring: 184 75% 48%;
+  }
+
+  .dark {
+    --background: 213 65% 5%;
+    --foreground: 0 0% 98%;
+    --card: 213 70% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 213 70% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 184 75% 48%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 213 60% 11%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 213 50% 13%;
+    --muted-foreground: 210 15% 65%;
+    --accent: 28 95% 58%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 213 40% 18%;
+    --input: 213 50% 13%;
+    --ring: 184 75% 48%;
+
+    --sidebar-background: 213 65% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 184 75% 48%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 213 60% 11%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 213 40% 18%;
+    --sidebar-ring: 184 75% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .card-elevated {
+    @apply bg-card rounded-lg p-6 shadow-md shadow-primary/5 border border-border;
+  }
+
+  .tab-item {
+    @apply px-4 py-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-primary/80 hover:text-primary-foreground;
+  }
+
+  .tab-item-active {
+    @apply bg-primary text-primary-foreground;
+  }
+}
+
+@layer utilities {
+  @keyframes pulse-node {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+
+  /* === Premium auth animations === */
+  @keyframes auth-breathe {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.06); }
+  }
+  @keyframes auth-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes auth-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes auth-particle {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    20% { opacity: 0.7; }
+    100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
+  }
+  @keyframes auth-sweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  .animate-auth-breathe { animation: auth-breathe 7s ease-in-out infinite; }
+  .animate-auth-float { animation: auth-float 8s ease-in-out infinite; }
+  .animate-auth-particle { animation: auth-particle 9s linear infinite; }
+
+  .btn-qiyaf-gradient {
+    position: relative;
+    background-image: linear-gradient(90deg, #22D3EE 0%, #6FAF6A 50%, #FF9800 100%);
+    transition: box-shadow 0.3s ease, transform 0.2s ease, filter 0.3s ease;
+    box-shadow:
+      0 10px 30px -10px rgba(255, 152, 0, 0.45),
+      0 8px 24px -10px rgba(34, 211, 238, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .btn-qiyaf-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 45%, transparent 60%);
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+  .btn-qiyaf-gradient:hover {
+    box-shadow:
+      0 16px 40px -10px rgba(255, 152, 0, 0.55),
+      0 12px 32px -8px rgba(34, 211, 238, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+  .btn-qiyaf-gradient:active {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+
+  .input-premium {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #262626;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .input-premium:focus,
+  .input-premium:focus-visible {
+    border-color: rgba(17, 197, 217, 0.6);
+    box-shadow: 0 0 0 3px rgba(17, 197, 217, 0.12), 0 8px 24px -10px rgba(17, 197, 217, 0.35);
+    background: rgba(255, 255, 255, 0.05);
+    outline: none;
+  }
+
+  .text-gradient-warm {
+    background: linear-gradient(90deg, #FFFFFF 0%, #FFE2B5 60%, #FF9800 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gradient-orange {
+    background: linear-gradient(90deg, #11C5D9 0%, #4FB37A 50%, #FF9800 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+/* Custom themed scrollbar (Qiya cyan) */
+.qiya-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.qiya-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+.qiya-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.35), rgba(0, 108, 158, 0.45));
+  border-radius: 8px;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+}
+.qiya-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.55), rgba(0, 108, 158, 0.65));
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+}
+.qiya-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.qiya-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.4) rgba(255, 255, 255, 0.02);
+}
+
+/* Unified Qiya KPI/box style — matches System Overview total-inspected card */
+.qiya-box {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 30px rgba(0, 108, 158, 0.06);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.qiya-box:hover {
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.12);
+}
+
+/* Hide scrollbar utility for horizontal nav scrollers */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
