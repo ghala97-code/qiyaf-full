@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from typing import List
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db

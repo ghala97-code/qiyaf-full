@@ -28,7 +28,7 @@ app.include_router(auth.router)
 app.include_router(inspections.router)
 app.include_router(inference.router)
 app.include_router(upload.router)
-app.include_router(prediction.router)
+#app.include_router(prediction.router)
 
 @app.get("/")
 def read_root():

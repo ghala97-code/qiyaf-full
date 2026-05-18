@@ -161,7 +161,7 @@ def process_video_file(video_path: str):
 
         annotated = frame.copy()
 
-        result = track_panels(frame)
+        result = predict_panels(frame)
 
         current_ids = set()
 

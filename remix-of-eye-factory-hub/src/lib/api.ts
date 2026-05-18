@@ -1,5 +1,5 @@
 // Backend API configuration
-export const API_BASE_URL = ' https://doodle-premises-veto.ngrok-free.dev';
+export const API_BASE_URL = 'http://localhost:8000';
 
 export const apiUrl = (path: string) => {
   const p = path.startsWith('/') ? path : `/${path}`;
@@ -8,7 +8,7 @@ export const apiUrl = (path: string) => {
 
 export async function predictInspection(file: File): Promise<unknown> {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('file', file);
 
   const url = apiUrl('/inspections/predict');
   let response: Response;
