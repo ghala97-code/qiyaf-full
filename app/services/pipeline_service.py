@@ -27,7 +27,8 @@ from app.utils.image_utils import (
 )
 
 from app.utils.prediction_utils import final_panel_status
-from app.utils.constants import DEFAULT_LABEL
+from app.utils.constants import DEFAULT_LABEL ,MIN_TRACK_FRAMES ,MIN_TRACK_HITS_TO_DRAW
+#from fastapi import File
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -128,8 +129,11 @@ def process_image_file(image_path: str):
 # ===================== VIDEO =====================
 
 def process_video_file(video_path: str):
+    print("OPEN VIDEO:", video_path)
     cap = open_video(video_path)
     meta = get_video_metadata(cap)
+
+    print("VIDEO META:", meta)
 
     fps = meta["fps"]
     width = meta["width"]
@@ -149,6 +153,7 @@ def process_video_file(video_path: str):
 
     while True:
         ret, frame = cap.read()
+
         if not ret:
             break
 
@@ -161,11 +166,24 @@ def process_video_file(video_path: str):
 
         annotated = frame.copy()
 
-        result = predict_panels(frame)
+        # ===== TRACKER =====
+        result = track_panels(frame)
 
-        current_ids = set()
+        if result.boxes is None:
+            print("FRAME:", frame_index, "TRACK BOXES: None")
+        else:
+            print(
+                "FRAME:",
+                frame_index,
+                "TRACK BOXES:",
+                len(result.boxes),
+                "IDS:",
+                result.boxes.id
+            )
+            current_ids = set()
 
         if result.boxes is not None and len(result.boxes) > 0:
+
             boxes = result.boxes.xyxy.cpu().numpy()
             confs = result.boxes.conf.cpu().numpy()
 
@@ -175,6 +193,7 @@ def process_video_file(video_path: str):
                 ids = np.arange(len(boxes))
 
             for i, box in enumerate(boxes):
+
                 crop, expanded_box = crop_panel(frame, box)
 
                 if crop is None:
@@ -185,6 +204,7 @@ def process_video_file(video_path: str):
                 label, defect_conf = final_panel_status(defect_result)
 
                 tid = int(ids[i])
+
                 current_ids.add(tid)
 
                 state = tracker.update_track(
@@ -195,28 +215,16 @@ def process_video_file(video_path: str):
                     frame_number=processed_frames,
                 )
 
-                if state["hits"] >= 5:
+                print("TRACK STATE:", state)
+
+                # ===== TEMP TEST =====
+                if state["hits"] >= MIN_TRACK_HITS_TO_DRAW:
                     draw_detection(
                         annotated,
                         box=state["smooth_box"],
                         label=state["stable_label"],
                         panel_id=state["track_id"],
                     )
-
-        # handle missing tracks
-        missing = tracker.get_recent_missing_tracks(
-            current_ids=current_ids,
-            frame_number=processed_frames,
-        )
-
-        for m in missing:
-            draw_detection(
-                annotated,
-                box=m["smooth_box"],
-                label=m["stable_label"],
-                panel_id=m["track_id"],
-                color=(0, 180, 0),
-            )
 
         writer.write(annotated)
 
@@ -226,9 +234,16 @@ def process_video_file(video_path: str):
     elapsed = time.time() - start
 
     detections = tracker.final_results()
+    detections = [
+        d for d in detections
+        if d.get("frames_seen", 0) >= MIN_TRACK_FRAMES
+    ]
+    print("FINAL DETECTIONS:", detections)
+    print("TOTAL FINAL:", len(detections))
 
     for d in detections:
         d["image_path"] = out_path
+
 
     return {
         "input_type": "video",

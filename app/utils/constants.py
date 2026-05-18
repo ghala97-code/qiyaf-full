@@ -24,18 +24,18 @@ MIN_PANEL_H = 80
 MIN_PANEL_AREA = 5000
 MIN_BOX_AREA_RATIO = 0.002
 
-FRAME_STRIDE = 3
+FRAME_STRIDE = 1
 
 TRACKER_CFG = "bytetrack.yaml"
 
-MIN_TRACK_FRAMES = 5
-MIN_TRACK_HITS_TO_DRAW = 5
-MAX_MISSING_FRAMES = 6
+MIN_TRACK_FRAMES = 2
+MIN_TRACK_HITS_TO_DRAW = 3
+MAX_MISSING_FRAMES = 4
 BOX_SMOOTH_ALPHA = 0.70
 
 TRACK_RULES = {
-    "bird_drop": {"min_count": 4, "min_ratio": 0.12, "min_mean_conf": 0.28},
+    "bird_drop": {"min_count": 4, "min_ratio": 0.12, "min_mean_conf": 0.30},
     "cracks": {"min_count": 4, "min_ratio": 0.12, "min_mean_conf": 0.30},
     "dust": {"min_count": 5, "min_ratio": 0.15, "min_mean_conf": 0.25},
-    "snow": {"min_count": 12, "min_ratio": 0.35, "min_mean_conf": 0.40},
+    "snow": {"min_count": 10, "min_ratio": 0.35, "min_mean_conf": 0.40},
 }
