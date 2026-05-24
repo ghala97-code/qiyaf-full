@@ -182,7 +182,7 @@ const UploadTab = () => {
     setIsAnalyzing(true);
     setHasResult(false);
     try {
-      const result = await predictInspection(selectedFile);
+      const result = await predictInspection([selectedFile]);
       console.log('Inspection prediction result:', result);
       setHasResult(true);
     } catch (err) {
