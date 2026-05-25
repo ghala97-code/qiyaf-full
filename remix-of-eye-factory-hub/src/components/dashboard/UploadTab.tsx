@@ -75,11 +75,6 @@ const severityStyles: Record<Severity, { dot: string; pill: string; border: stri
   },
 };
 
-const detections: Detection[] = [
-  { id: 'C-102', label: 'Cracks', severity: 'critical', box: { left: 12, top: 18, width: 26, height: 22 } },
-  { id: 'S-205', label: 'Snow', severity: 'warning', box: { left: 55, top: 12, width: 32, height: 28 } },
-  { id: 'D-309', label: 'Dust', severity: 'warning', box: { left: 30, top: 58, width: 38, height: 24 } },
-];
 
 const recommendations: Recommendation[] = [
   {
@@ -138,6 +133,7 @@ const UploadTab = () => {
   const [hasResult, setHasResult] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [detections, setDetections] = useState<Detection[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -183,6 +179,9 @@ const UploadTab = () => {
     setHasResult(false);
     try {
       const result = await predictInspection([selectedFile]);
+      if (result?.detections) {
+  setDetections(result.detections);
+}
       console.log('Inspection prediction result:', result);
       setHasResult(true);
     } catch (err) {
