@@ -380,7 +380,7 @@ if (result?.output_url || result?.output_path) {
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
                         <span
-                          className={w-2 h-2 rounded-full ${s.dot}}
+                          className={`w-2 h-2 rounded-full ${s.dot}`}
                         />
 
                         <span className="text-foreground">
@@ -393,7 +393,7 @@ if (result?.output_url || result?.output_path) {
 
                     <td className="py-3 px-3">
                       <span
-                        className={inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}}
+                        className={`inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}`}
                       >
                         {Math.round(
                           (d.confidence || 0) * 100
