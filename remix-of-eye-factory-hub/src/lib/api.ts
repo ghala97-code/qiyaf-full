@@ -6,7 +6,14 @@ export const apiUrl = (path: string) => {
   return `${API_BASE_URL}${p}`;
 };
 
-export async function predictInspection(files: File[]): Promise<unknown> {
+type PredictionResponse = {
+  output_url?: string;
+  detections?: any[];
+};
+
+export async function predictInspection(
+  files: File[]
+): Promise<PredictionResponse> {
   const formData = new FormData();
   for (const file of files) {
     formData.append('files', file);
