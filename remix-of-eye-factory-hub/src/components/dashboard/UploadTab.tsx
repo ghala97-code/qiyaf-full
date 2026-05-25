@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Upload, Loader2, Zap, Snowflake, Lightbulb, X } from 'lucide-react';
+import {
+  Upload,
+  Loader2,
+  Zap,
+  Snowflake,
+  Lightbulb,
+  X,
+} from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { predictInspection } from '@/lib/api';
@@ -13,6 +21,7 @@ interface Detection {
   severity: Severity;
   confidence?: number;
   class_name?: string;
+
   box: {
     left: number;
     top: number;
@@ -34,7 +43,12 @@ interface Recommendation {
 
 const recTones: Record<
   RecTone,
-  { card: string; iconWrap: string; pill: string; button: string }
+  {
+    card: string;
+    iconWrap: string;
+    pill: string;
+    button: string;
+  }
 > = {
   red: {
     card:
@@ -44,6 +58,7 @@ const recTones: Record<
     button:
       'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/40',
   },
+
   blue: {
     card:
       'border-blue-500/40 bg-gradient-to-br from-blue-950/40 via-[#0a1424] to-[#05080f]',
@@ -52,6 +67,7 @@ const recTones: Record<
     button:
       'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/40',
   },
+
   amber: {
     card:
       'border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-[#1a1408] to-[#0a0805]',
@@ -64,7 +80,12 @@ const recTones: Record<
 
 const severityStyles: Record<
   Severity,
-  { dot: string; pill: string; border: string; label: string }
+  {
+    dot: string;
+    pill: string;
+    border: string;
+    label: string;
+  }
 > = {
   critical: {
     dot: 'bg-red-500',
@@ -72,12 +93,14 @@ const severityStyles: Record<
     border: 'border-red-500/70',
     label: 'Critical',
   },
+
   warning: {
     dot: 'bg-amber-400',
     pill: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
     border: 'border-amber-400/70',
     label: 'Warning',
   },
+
   normal: {
     dot: 'bg-cyan-400',
     pill: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
@@ -91,26 +114,32 @@ const recommendations: Recommendation[] = [
     title: 'Repair Cracked Panels',
     description:
       'Surface cracks compromise the panel and should be inspected.',
+
     priority: 'High Priority',
     cta: 'Dispatch Engineer',
+
     icon: <Zap className="w-5 h-5" />,
     tone: 'red',
   },
+
   {
     title: 'Clear Snow',
-    description:
-      'Remove snow coverage from the panel surface.',
+    description: 'Remove snow coverage from the panel surface.',
+
     priority: 'Medium Priority',
     cta: 'Schedule Cleaning',
+
     icon: <Snowflake className="w-5 h-5" />,
     tone: 'blue',
   },
+
   {
     title: 'Clean Panels',
-    description:
-      'Remove dust or bird droppings.',
+    description: 'Remove dust or bird droppings.',
+
     priority: 'Medium Priority',
     cta: 'Schedule Cleaning',
+
     icon: <Lightbulb className="w-5 h-5" />,
     tone: 'amber',
   },
@@ -152,6 +181,7 @@ const UploadTab = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+
     handleFiles(e.dataTransfer.files);
   };
 
@@ -174,6 +204,7 @@ const UploadTab = () => {
 
     setPreviewUrl(URL.createObjectURL(file));
     setSelectedFile(file);
+
     setHasResult(false);
   };
 
@@ -195,13 +226,66 @@ const UploadTab = () => {
 
       console.log(result);
 
-if (result?.detections) {
-  setDetections(result.detections);
-}
+      // ===== DETECTIONS =====
 
-if (result?.output_url || result?.output_path) {
-  setOutputUrl(result.output_url || result.output_path);
-}
+      const pipelineDetections =
+        result?.results?.[0]?.pipeline_data?.detections;
+
+      if (pipelineDetections) {
+        setDetections(
+          pipelineDetections.map((d: any) => ({
+            id: d.panel_id?.toString() || '0',
+
+            label:
+              d.type === 'dust'
+                ? 'Dust'
+                : d.type === 'bird_drop'
+                ? 'Bird Droppings'
+                : d.type === 'crack'
+                ? 'Cracks'
+                : d.type === 'snow'
+                ? 'Snow'
+                : 'Clean',
+
+            class_name: d.type,
+
+            severity:
+              d.confidence >= 0.85
+                ? 'critical'
+                : d.confidence >= 0.6
+                ? 'warning'
+                : 'normal',
+
+            confidence: d.confidence || 0,
+
+            box: {
+              left: d.box?.x1 || 0,
+              top: d.box?.y1 || 0,
+
+              width:
+                (d.box?.x2 || 0) -
+                (d.box?.x1 || 0),
+
+              height:
+                (d.box?.y2 || 0) -
+                (d.box?.y1 || 0),
+            },
+          }))
+        );
+      }
+
+      // ===== OUTPUT IMAGE =====
+
+      const outputPath =
+        result?.results?.[0]?.pipeline_data?.output_path;
+
+      if (outputPath) {
+        const fileName = outputPath.split('/').pop();
+
+        setOutputUrl(
+          http://localhost:8000/ai_outputs/${fileName}
+        );
+      }
 
       setHasResult(true);
     } catch (err) {
@@ -269,6 +353,7 @@ if (result?.output_url || result?.output_path) {
           <div className="border-2 border-dashed border-cyan-500/20 rounded-xl flex-1 flex items-center justify-center min-h-[360px]">
             <div className="text-center">
               <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-4" />
+
               <p className="text-muted-foreground">
                 Analyzing image...
               </p>
@@ -335,7 +420,9 @@ if (result?.output_url || result?.output_path) {
               disabled={isAnalyzing || !selectedFile}
               onClick={handleAnalyze}
             >
-              {isAnalyzing ? 'Analyzing...' : 'Analyze File'}
+              {isAnalyzing
+                ? 'Analyzing...'
+                : 'Analyze File'}
             </Button>
           </>
         )}
@@ -356,8 +443,14 @@ if (result?.output_url || result?.output_path) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-white/5">
-                <th className="py-2.5 px-3 font-medium">ID</th>
-                <th className="py-2.5 px-3 font-medium">Type</th>
+                <th className="py-2.5 px-3 font-medium">
+                  ID
+                </th>
+
+                <th className="py-2.5 px-3 font-medium">
+                  Type
+                </th>
+
                 <th className="py-2.5 px-3 font-medium">
                   Confidence
                 </th>
@@ -380,7 +473,7 @@ if (result?.output_url || result?.output_path) {
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${s.dot}`}
+                          className={w-2 h-2 rounded-full ${s.dot}}
                         />
 
                         <span className="text-foreground">
@@ -393,7 +486,7 @@ if (result?.output_url || result?.output_path) {
 
                     <td className="py-3 px-3">
                       <span
-                        className={`inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}`}
+                        className={inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}}
                       >
                         {Math.round(
                           (d.confidence || 0) * 100
