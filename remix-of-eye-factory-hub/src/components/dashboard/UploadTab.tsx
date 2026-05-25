@@ -195,13 +195,13 @@ const UploadTab = () => {
 
       console.log(result);
 
-      if (result?.detections) {
-        setDetections(result.detections);
-      }
+if (result?.detections) {
+  setDetections(result.detections);
+}
 
-      if (result?.output_url) {
-        setOutputUrl(result.output_url);
-      }
+if (result?.output_url || result?.output_path) {
+  setOutputUrl(result.output_url || result.output_path);
+}
 
       setHasResult(true);
     } catch (err) {
