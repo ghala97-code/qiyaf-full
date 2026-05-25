@@ -40,6 +40,11 @@ services:
   worker:
     build: .
     container_name: qiyaf_worker
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
     command: celery -A app.core.celery_config.celery_app worker --loglevel=info
     volumes:
       - .:/app

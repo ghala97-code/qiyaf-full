@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.db import models
 
-# استدعاء دالة الذكاء الاصطناعي الشاملة
+# calling the AI pipeline function
 from app.services.pipeline_service import run_pipeline_file
 
 # إيقاف الـ OpenCL لمنع انهيار الدوكر مع OpenCV
