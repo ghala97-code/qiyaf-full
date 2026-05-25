@@ -8,6 +8,7 @@ export const apiUrl = (path: string) => {
 
 type PredictionResponse = {
   output_url?: string;
+  output_path?: string;
   detections?: any[];
 };
 
