@@ -1,5 +1,12 @@
 import os
-from pydantic_settings import BaseSettings
+try:
+    from pydantic.settings import BaseSettings
+except ImportError:
+    try:
+        from pydantic_settings import BaseSettings
+    except ImportError:
+        # Fallback for environments with pydantic v1 (or where pydantic_settings isn't available)
+        from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "QIYAAF - Solar Fault Detection"

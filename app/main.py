@@ -1,5 +1,8 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware # استيراد المكتبة المطلوبة
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles # استيراد مكتبة الملفات الثابتة لتشغيل مسار الصور
+import os
+
 from app.routers import auth, inspections, upload, prediction, inference
 from app.core.database import engine
 from app.db import models
@@ -17,11 +20,24 @@ app = FastAPI(
 # --- إضافة إعدادات الـ CORS للربط مع الفرونت آند ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # يسمح لجميع الروابط بالوصول (مناسب جداً وقت التطوير والاجتماع)
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"], # يسمح بجميع أنواع الطلبات (GET, POST, etc.)
-    allow_headers=["*"], # يسمح بجميع الـ Headers
+    allow_methods=["*"], 
+    allow_headers=["*"], 
 )
+
+# --- 🚀 الـ Middleware السحري لتخطي شاشة تحذير ngrok وتمرير الصور فوراً ---
+@app.middleware("http")
+async def add_ngrok_skip_header(request: Request, call_next):
+    response: Response = await call_next(request)
+    # إضافة الهيدر الذي يمنع ngrok من حجب الصور والطلبات عن المتصفح
+    response.headers["ngrok-skip-browser-warning"] = "true"
+    return response
+
+# --- 📸 مشاركة وعرض مجلد الصور المخرجة من الذكاء الاصطناعي (Static Serve) ---
+# يقوم بمشاركة المجلد الموجود داخل حاوية الدوكر ليكون متاحاً عبر الرابط مباشرة
+if os.path.exists("/app/app/ai_outputs"):
+    app.mount("/ai_outputs", StaticFiles(directory="/app/app/ai_outputs"), name="ai_outputs")
 
 # --- ربط المسارات (Routers) ---
 app.include_router(auth.router)

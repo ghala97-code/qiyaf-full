@@ -228,63 +228,91 @@ const UploadTab = () => {
 
       // ===== DETECTIONS =====
 
-      const pipelineDetections =
-        result?.results?.[0]?.pipeline_data?.detections;
+      const resultsArray = (result as any)?.results;
 
-      if (pipelineDetections) {
-        setDetections(
-          pipelineDetections.map((d: any) => ({
-            id: d.panel_id?.toString() || '0',
+      if (resultsArray && Array.isArray(resultsArray) && resultsArray.length > 0) {
+        // 1. الدخول لأول عنصر في الـ results
+        const firstResult = resultsArray[0];
+        
+        // 2. الدخول للـ pipeline_data ومن ثم مصفوفة الـ detections الحقيقية
+        const innerDetections = firstResult?.pipeline_data?.detections;
 
-            label:
-              d.type === 'dust'
-                ? 'Dust'
-                : d.type === 'bird_drop'
-                ? 'Bird Droppings'
-                : d.type === 'crack'
-                ? 'Cracks'
-                : d.type === 'snow'
-                ? 'Snow'
-                : 'Clean',
+        if (innerDetections && Array.isArray(innerDetections)) {
+          setDetections(
+            innerDetections.map((d: any, index: number) => {
+              // تحويل الإحداثيات إذا كانت نصاً أو كائناً قادماً من الباك إند
+              const coords = typeof d.box_coordinates === 'string' 
+                ? JSON.parse(d.box_coordinates) 
+                : d.box_coordinates;
 
-            class_name: d.type,
+              const faultType = String(d.fault_type || '').toLowerCase();
 
-            severity:
-              d.confidence >= 0.85
-                ? 'critical'
-                : d.confidence >= 0.6
-                ? 'warning'
-                : 'normal',
+              return {
+                id: d.id?.toString() || (index + 1).toString(),
 
-            confidence: d.confidence || 0,
+                label:
+                  faultType.includes('crack')
+                    ? 'Cracks'
+                    : faultType.includes('dust')
+                    ? 'Dust'
+                    : faultType.includes('drop') || faultType.includes('bird')
+                    ? 'Bird Droppings'
+                    : faultType.includes('snow')
+                    ? 'Snow'
+                    : 'Clean',
 
-            box: {
-              left: d.box?.x1 || 0,
-              top: d.box?.y1 || 0,
+                class_name: d.fault_type || 'unknown',
 
-              width:
-                (d.box?.x2 || 0) -
-                (d.box?.x1 || 0),
+                severity:
+                  (d.confidence || 0) >= 0.85
+                    ? 'critical'
+                    : (d.confidence || 0) >= 0.6
+                    ? 'warning'
+                    : 'normal',
 
-              height:
-                (d.box?.y2 || 0) -
-                (d.box?.y1 || 0),
-            },
-          }))
-        );
+                confidence: d.confidence !== undefined ? d.confidence : 0,
+
+                box: {
+                  left: coords?.x1 || 0,
+                  top: coords?.y1 || 0,
+                  width: (coords?.x2 || 0) - (coords?.x1 || 0),
+                  height: (coords?.y2 || 0) - (coords?.y1 || 0),
+                },
+              };
+            })
+          );
+        } else {
+          // إذا كانت مصفوفة الـ detections فاضية معناها اللوحة نظيفة
+          setDetections([]);
+        }
+      }
+
+      // ===== OUTPUT IMAGE =====
+      const resultsArrayForImage = (result as any)?.results;
+
+      if (resultsArrayForImage && Array.isArray(resultsArrayForImage) && resultsArrayForImage.length > 0) {
+        const outputResult = resultsArrayForImage[0];
+        const outputPath = outputResult?.pipeline_data?.output_path;
+
+        if (outputPath) {
+          const fileName = outputPath.substring(outputPath.lastIndexOf('/') + 1);
+          setOutputUrl(
+            `https://dedicate-yummy-vindicate.ngrok-free.dev/ai_outputs/${fileName}`
+          );
+        }
       }
 
       // ===== OUTPUT IMAGE =====
 
       const outputPath =
-        result?.results?.[0]?.pipeline_data?.output_path;
+        (result as any)?.pipeline_data?.output_path;
 
       if (outputPath) {
         const fileName = outputPath.split('/').pop();
 
         setOutputUrl(
-          http://localhost:8000/ai_outputs/${fileName}
-        );
+           `https://dedicate-yummy-vindicate.ngrok-free.dev/ai_outputs/${fileName}`
+      );
       }
 
       setHasResult(true);
@@ -473,7 +501,7 @@ const UploadTab = () => {
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
                         <span
-                          className={w-2 h-2 rounded-full ${s.dot}}
+                          className={`w-2 h-2 rounded-full ${s.dot}`}
                         />
 
                         <span className="text-foreground">
@@ -486,7 +514,7 @@ const UploadTab = () => {
 
                     <td className="py-3 px-3">
                       <span
-                        className={inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}}
+                        className={`inline-block text-[11px] px-2.5 py-1 rounded-full border ${s.pill}`}
                       >
                         {Math.round(
                           (d.confidence || 0) * 100
