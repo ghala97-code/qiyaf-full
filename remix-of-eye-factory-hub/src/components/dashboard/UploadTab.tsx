@@ -224,8 +224,8 @@ const UploadTab = () => {
     try {
       const result = await predictInspection([selectedFile]);
 
-      console.log(result);
-
+      alert(JSON.stringify(result, null, 2));
+      console.log(result)
       // ===== DETECTIONS =====
 
       const resultsArray = (result as any)?.results;
@@ -301,19 +301,7 @@ const UploadTab = () => {
           );
         }
       }
-
-      // ===== OUTPUT IMAGE =====
-
-      const outputPath =
-        (result as any)?.pipeline_data?.output_path;
-
-      if (outputPath) {
-        const fileName = outputPath.split('/').pop();
-
-        setOutputUrl(
-           `https://dedicate-yummy-vindicate.ngrok-free.dev/ai_outputs/${fileName}`
-      );
-      }
+      
 
       setHasResult(true);
     } catch (err) {
